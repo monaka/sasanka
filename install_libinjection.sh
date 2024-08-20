@@ -1,3 +1,5 @@
+#!/bin/bash
+
 GIT_DIR=$(cd $(dirname $0); pwd)
 # prepare
 sudo apt install -y autoconf luajit=2.1.* libluajit-5.1
