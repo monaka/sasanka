@@ -1,3 +1,5 @@
+#!/bin/bash
+
 dir="rocks"
 subdirs=$(ls -d "$dir"/* )
 PLUGINS_str=$(echo "${subdirs//$dir\//}" | tr '\n' ' ')

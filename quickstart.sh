@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Prerequirements:
 #   Kong has been installed
 #   Service has been initialized
