@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Prerequirements:
 #   Kong has been installed
 #   Service has been initialized
@@ -6,14 +8,14 @@
 
 SERVICENAME=$1
 
-if test ${#SERVICENAME} -eq 0 ; then
+if test "${#SERVICENAME}" -eq 0 ; then
     echo "input YOUR_SERVICE_NAME_OR_ID in arg1"
 fi
 
 
 # config module
 echo -e "\n\nConfigure ssk-pm\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
     -H "Content-Type: application/json" \
     -d '{"name": "ssk-pm", "config": { "patterns" : [] } }'
 
@@ -27,7 +29,7 @@ curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
 
 # config module
 echo -e "\n\nConfigure ssk-cors\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
 	-d name=ssk-cors \
 	-d config.block=false \
 	-d config.modify_response_header=true \
@@ -40,8 +42,8 @@ curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
 
 # config module
 echo -e "\n\nConfigure ssk-detecthandling\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \ 
-    -H "Content-Type: application/json" 
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
+    -H "Content-Type: application/json" \
     -d '{"name": "ssk-detecthandling", 
         "config": {"filters" : 
             [{"tag" : "status_401","status" : 401,"headers" : [ {"key": "CustomHeader", "value": "CustomValue" },{"key": "CustomHeader2", "value" : "CustomValue2" }],"body" : "blocked","default" : true},
@@ -53,14 +55,14 @@ curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
 # config module
 # you can check the detected log in error.log
 echo -e "\n\nConfigure ssk-std-logger\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
     -d "name=ssk-std-logger" \
     -d "config.std=err"
 
 
 # config module
 echo -e "\n\nConfigure ssk-ua-filter\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
     -d "name=ssk-ua-filter" \
     -d "config.block_no_useragent=true"
 
@@ -75,7 +77,7 @@ curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
 
 # config module
 echo -e "\n\nConfigure ssk-click-jacking\n"
-curl -i -X POST http://localhost:8001/services/${SERVICENAME}/plugins \
+curl -i -X POST "http://localhost:8001/services/${SERVICENAME}/plugins" \
     -d "name=ssk-clickjacking" \
     -d "config.policy=DENY"
 
@@ -100,39 +102,39 @@ tar -xvzf v3.3.4.tar.gz
 sudo apt-get update -y
 sudo apt-get install -y libregexp-assemble-perl
 
-pushd coreruleset-3.3.4/util/regexp-assemble
+pushd coreruleset-3.3.4/util/regexp-assemble || (echo "internal error: pushd failed." 1>&2; exit 1)
 mkdir build
 
 files=(regexp-932100.txt regexp-932105.txt regexp-932106.txt regexp-932110.txt regexp-932115.txt regexp-932150.txt regexp-934100.txt)
-for f in ${files[@]}
+for f in "${files[@]}"
 do
         echo "loading $f"
-        cat $f| python3 regexp-cmdline.py unix | ./regexp-assemble.pl > build/${f}
+        python3 regexp-cmdline.py unix < "$f" | ./regexp-assemble.pl > "build/${f}"
         echo "saved build/$f"
 done
 
 bfiles=(933131 941130 941160 942120 942130 942140 942150 942170 942180 942190 942200 942210 942240 942280 942300 942310 942320 942330 942340 942350 942360 942370 942380 942390 942400 942410 942470 942480)
-for bf in ${bfiles[@]}
+for bf in "${bfiles[@]}"
 do
     bfile="regexp-$bf.data"
     echo "loading $bfile"
-    ./regexp-assemble.pl $bfile > build/$bfile
+    ./regexp-assemble.pl "$bfile" > "build/$bfile"
     echo "saved build/$bfile"
 done
 
 bv2files=(942260)
-for bf in ${bv2files[@]}
+for bf in "${bv2files[@]}"
 do
     bfile="regexp-$bf.data"
     echo "loading $bfile"
-    ./regexp-assemble-v2.pl $bfile > build/$bfile
+    ./regexp-assemble-v2.pl "$bfile" > "build/$bfile"
     echo "saved build/$bfile"
 done
 
 echo "finished to build CoreRuleSet"
-popd
+popd || (echo "internal error: popd failed." 1>&2; exit 1)
 
-python3 tools/quickstart.py --service $SERVICENAME
+python3 tools/quickstart.py --service "$SERVICENAME"
 
 
 echo "

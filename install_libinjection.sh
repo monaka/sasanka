@@ -1,11 +1,13 @@
-GIT_DIR=$(cd $(dirname $0); pwd)
+#!/bin/bash
+
+GIT_DIR=$(cd "$(dirname $0)"; pwd)
 # prepare
 sudo apt install -y autoconf luajit=2.1.* libluajit-5.1
 sudo apt install -y swig
-git clone https://github.com/libinjection/libinjection ${GIT_DIR}/libinjection
+git clone https://github.com/libinjection/libinjection "${GIT_DIR}/libinjection"
 
 # version of Mar 30, 2023
-cd ${GIT_DIR}/libinjection/
+cd "${GIT_DIR}/libinjection/"
 git checkout c1831ca56351c351744acdff6bf3cca250ae1df7
 
 # build
