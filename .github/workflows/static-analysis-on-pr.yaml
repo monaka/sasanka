@@ -15,6 +15,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.pull_request.base.sha }}
+    - uses: actions/checkout@v4
     - name: Enable Problem Matchers
       run: echo "::add-matcher::.github/shellcheck-matcher.json"
     - name: Check scripts with shellcheck
